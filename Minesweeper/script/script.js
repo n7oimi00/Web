@@ -16,21 +16,31 @@ function drawBoard(size) {
             graphic.classList.add("cell")
             graphic.addEventListener("click", () => clickCell(cell))
             row.appendChild(graphic)
+            cell["graphic"] = graphic
+            grid[cell["id"]] = cell
         }
     }
     
-    placeMines()
+    placeMines(30, size, grid)
 }
 
-function placeMines(mines) {
-
+function placeMines(mines, size, grid) {
+    for (let placedMines = 0; placedMines <= mines;) {
+        let x = randomNumber(size)
+        let y = randomNumber(size)
+        let cell = grid[x + "" + y]
+        if (!cell["mined"]) {
+            cell["mined"] = true
+            ++placedMines
+        }
+    }
 } 
 
 function clickCell(cell) {
     console.log(cell)
-    console.log(event)
+    console.log(event.which)
 }
 
 function randomNumber(max) {
-    return 
+    return Math.floor(Math.random() * max)
 }
