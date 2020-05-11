@@ -21,7 +21,7 @@ function drawBoard(size) {
         }
     }
     
-    placeMines(0, size, grid)
+    placeMines(30, size, grid)
     calculateMineCount(grid, size)
 }
 
@@ -40,10 +40,18 @@ function placeMines(mines, size, grid) {
 
 function calculateMineCount(grid, size) {
     for (let [, value] of Object.entries(grid)) {
-        if (!value.mined) {
-            console.log(value.id)
-            findNeighbours(value, size)
-        }        
+        let neighbours = findNeighbours(value, size)
+        value["neighbours"] = neighbours
+        
+        if(!value["mined"]) {
+            let adjacentMines = 0 
+            neighbours.forEach(neighbour => {
+                if(grid[neighbour]["mined"]) {
+                    adjacentMines++
+                }
+            })            
+            value["adjacentMines"] = adjacentMines
+        }
     }
 }
 
@@ -77,14 +85,14 @@ function findNeighbours(cell, size) {
         }        
     }
 
-    console.log(neighbours)
+    return neighbours
 }
 
 function clickCell(cell) {
     if (cell["mined"]) {
         cell["graphic"].innerHTML = "X"
     } else {
-
+        cell["graphic"].innerHTML = cell["adjacentMines"]
     }
 }
 
