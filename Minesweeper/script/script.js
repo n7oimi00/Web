@@ -10,7 +10,7 @@ function drawBoard(size) {
         board.appendChild(row)
         for (let j = 0; j < size; j++) {
             let cell = {}
-            cell["id"] = i + "" + j
+            cell["id"] = i + "/" + j
             cell["mined"] = false
             let graphic = document.createElement("div")
             graphic.classList.add("cell")
@@ -21,24 +21,71 @@ function drawBoard(size) {
         }
     }
     
-    placeMines(30, size, grid)
+    placeMines(0, size, grid)
+    calculateMineCount(grid, size)
 }
 
 function placeMines(mines, size, grid) {
-    for (let placedMines = 0; placedMines <= mines;) {
+    for (let placedMines = 0; placedMines < mines;) {
         let x = randomNumber(size)
         let y = randomNumber(size)
-        let cell = grid[x + "" + y]
+        let cell = grid[x + "/" + y]
         if (!cell["mined"]) {
             cell["mined"] = true
             ++placedMines
         }
     }
+    //return grid
 } 
 
+function calculateMineCount(grid, size) {
+    for (let [, value] of Object.entries(grid)) {
+        if (!value.mined) {
+            console.log(value.id)
+            findNeighbours(value, size)
+        }        
+    }
+}
+
+function findNeighbours(cell, size) {
+    let x = Number(cell.id.match(/\d+/)[0])
+    let y = Number(cell.id.match(/\d+$/)[0])
+    let neighbours = []
+
+    if(x != 0) {
+        if(y != 0) {
+            neighbours.push((x - 1) + "/" + (y - 1))
+        }
+        neighbours.push((x - 1) + "/" + y)
+        if(y != (size - 1)) {
+            neighbours.push((x - 1) + "/" + (y + 1))
+        }        
+    }
+    if (y != 0) {
+        neighbours.push(x + "/" + (y - 1))
+    }
+    if (y != (size - 1)){
+        neighbours.push(x + "/" + (y + 1))    
+    }
+    if(x != (size - 1)) {
+        if(y != 0) {
+            neighbours.push((x + 1) + "/" + (y - 1))
+        }
+        neighbours.push((x + 1) + "/" + y)
+        if(y != (size - 1)) {
+            neighbours.push((x + 1) + "/" + (y + 1))
+        }        
+    }
+
+    console.log(neighbours)
+}
+
 function clickCell(cell) {
-    console.log(cell)
-    console.log(event.which)
+    if (cell["mined"]) {
+        cell["graphic"].innerHTML = "X"
+    } else {
+
+    }
 }
 
 function randomNumber(max) {

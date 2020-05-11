@@ -4,3 +4,7 @@
     height: 45px;
     width: 45px;
 }
+
+.cell:hover {
+    background-color: grey;
+}
