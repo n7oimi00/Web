@@ -14,14 +14,14 @@ function drawBoard(size) {
             cell["mined"] = false
             let graphic = document.createElement("div")
             graphic.classList.add("cell")
-            graphic.addEventListener("click", () => clickCell(cell))
+            graphic.addEventListener("click", () => clickCell(cell, grid), {once: true})
             row.appendChild(graphic)
             cell["graphic"] = graphic
             grid[cell["id"]] = cell
         }
     }
     
-    placeMines(30, size, grid)
+    placeMines(20, size, grid)
     calculateMineCount(grid, size)
 }
 
@@ -35,7 +35,6 @@ function placeMines(mines, size, grid) {
             ++placedMines
         }
     }
-    //return grid
 } 
 
 function calculateMineCount(grid, size) {
@@ -56,7 +55,7 @@ function calculateMineCount(grid, size) {
 }
 
 function findNeighbours(cell, size) {
-    let x = Number(cell.id.match(/\d+/)[0])
+    let x = Number(cell.id.match(/^\d+/)[0])
     let y = Number(cell.id.match(/\d+$/)[0])
     let neighbours = []
 
@@ -88,11 +87,28 @@ function findNeighbours(cell, size) {
     return neighbours
 }
 
-function clickCell(cell) {
-    if (cell["mined"]) {
+function clickCell(cell, grid) {
+    if (cell["mined"] && !cell["clicked"]) {
         cell["graphic"].innerHTML = "X"
-    } else {
+    } else if (cell["adjacentMines"] > 0) {
+        cell["clicked"] = true
+        cell["graphic"].classList.add("clicked")
         cell["graphic"].innerHTML = cell["adjacentMines"]
+    } else {
+        cell["clicked"] = true
+        cell["graphic"].classList.add("clicked")
+        cell["neighbours"].forEach(neighbour => {
+            let neighbourCell = grid[neighbour]
+
+            if (neighbourCell["adjacentMines"] > 0) {
+                neighbourCell["clicked"] = true
+                neighbourCell["graphic"].classList.add("clicked")
+                neighbourCell["graphic"].innerHTML = neighbourCell["adjacentMines"]                
+            } 
+            if (neighbourCell["adjacentMines"] == 0 && !neighbourCell["clicked"]) {
+                clickCell(neighbourCell, grid)
+            }
+        })
     }
 }
 
