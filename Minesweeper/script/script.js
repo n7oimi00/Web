@@ -14,9 +14,11 @@ function drawBoard(size) {
             cell["mined"] = false
             let graphic = document.createElement("div")
             graphic.classList.add("cell")
-            graphic.addEventListener("click", () => clickCell(cell, grid), {once: true})
+            let handleClick = function () {clickCell(cell, grid)}
+            graphic.addEventListener("click", handleClick)
             row.appendChild(graphic)
             cell["graphic"] = graphic
+            cell["eventRemover"] = () => {cell["graphic"].removeEventListener("click", handleClick)}
             grid[cell["id"]] = cell
         }
     }
@@ -89,7 +91,7 @@ function findNeighbours(cell, size) {
 
 function clickCell(cell, grid) {
     if (cell["mined"] && !cell["clicked"]) {
-        cell["graphic"].innerHTML = "X"
+        revealMines(grid)
     } else if (cell["adjacentMines"] > 0) {
         cell["clicked"] = true
         cell["graphic"].classList.add("clicked")
@@ -111,6 +113,16 @@ function clickCell(cell, grid) {
         })
     }
 }
+
+function revealMines(grid) {
+    for (let [, value] of Object.entries(grid)) {
+        value["eventRemover"]()
+        if (value["mined"]) {
+            value["graphic"].innerHTML = "¤"
+        }
+    }    
+}
+
 
 function randomNumber(max) {
     return Math.floor(Math.random() * max)
